@@ -121,7 +121,7 @@ public class HashIndex implements Index {
 	 * @param rpb the number of records per block (not used here)
 	 * @return the cost of traversing the index
 	 */
-	public static int searchCost(int numblocks, int rpb){
+	public static int searchCost(int numblocks, int rpb){ //maybe the I/O cost? and make sure it still works
 		return numblocks / HashIndex.NUM_BUCKETS;
 	}
 }

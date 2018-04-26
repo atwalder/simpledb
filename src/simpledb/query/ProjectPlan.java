@@ -10,6 +10,7 @@ import java.util.Collection;
 public class ProjectPlan implements Plan {
    private Plan p;
    private Schema schema = new Schema();
+   //private String tblname; //added
    
    /**
     * Creates a new project node in the query tree,
@@ -17,11 +18,17 @@ public class ProjectPlan implements Plan {
     * @param p the subquery
     * @param fieldlist the list of fields
     */
-   public ProjectPlan(Plan p, Collection<String> fieldlist) {
+   public ProjectPlan(Plan p, Collection<String> fieldlist) { //modified cause added
       this.p = p;
+      //this.tblname = tblname; //added
+      //this.tblname = tblname;
       for (String fldname : fieldlist)
          schema.add(fldname, p.schema());
    }
+   
+ //  public String getTablename() {
+ //  		return this.tblname; ///added
+ //  }
    
    /**
     * Creates a project scan for this query.
@@ -29,7 +36,7 @@ public class ProjectPlan implements Plan {
     */
    public Scan open() {
       Scan s = p.open();
-      return new ProjectScan(s, schema.fields());
+      return new ProjectScan(s, schema.fields()); 
    }
    
    /**

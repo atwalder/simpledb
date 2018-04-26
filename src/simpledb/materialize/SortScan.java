@@ -1,6 +1,9 @@
 package simpledb.materialize;
 
 import simpledb.record.RID;
+import simpledb.record.TableInfo;
+import simpledb.server.SimpleDB;
+import simpledb.tx.Transaction;
 import simpledb.query.*;
 import java.util.*;
 
@@ -12,11 +15,14 @@ import java.util.*;
  * @author sciore
  *
  */
+//project 2: UPDATED
 public class SortScan implements Scan {
    private UpdateScan s1, s2=null, currentscan=null;
    private RecordComparator comp;
    private boolean hasmore1, hasmore2=false;
    private List<RID> savedposition;
+   private Transaction tx;
+   private String tblname; //project 2: added to carry through for table info
    
    /**
     * Creates a sort scan, given a list of 1 or 2 runs.
@@ -25,14 +31,32 @@ public class SortScan implements Scan {
     * @param runs the list of runs
     * @param comp the record comparator
     */
-   public SortScan(List<TempTable> runs, RecordComparator comp) {
-      this.comp = comp;
+   public SortScan(String tblname, Transaction tx, List<TempTable> runs, RecordComparator comp) { //could pass in orignal record file
+      this.tblname = tblname;
+	  this.tx = tx;
+	  this.comp = comp;
+      runs.get(0).getTableInfo().setSorted(0); //project 2: when scanned by update scan, sorted flag reset to false
       s1 = (UpdateScan) runs.get(0).open();
       hasmore1 = s1.next();
       if (runs.size() > 1) {
-         s2 = (UpdateScan) runs.get(1).open();
+    	 runs.get(1).getTableInfo().setSorted(0); //project 2: when scanned by update scan, sorted flag reset to false
+    	 s2 = (UpdateScan) runs.get(1).open();
          hasmore2 = s2.next();
       }
+      
+      TableInfo orig = SimpleDB.mdMgr().getTableInfo(this.tblname, this.tx); //project 2: get TI of original table
+      TableScan ts = new TableScan(orig, this.tx); //project 2: open new table scan on original table
+      ts.beforeFirst(); //project 2: point before first record
+      runs.get(0).getTableInfo().setSorted(1); //project 2: runs is now sorted so set flag as true!
+      TableScan sorted = new TableScan(runs.get(0).getTableInfo(), this.tx); //project 2: hope creating tablescan from sorted temptable
+      sorted.beforeFirst(); //project 2: point before first record
+      
+      //project 2: replace each record in original table with the temp table sorted records
+      while (sorted.next() && ts.next())
+    	  ts.setVal("dataval", sorted.getVal("dataval"));
+      	  ts.setVal("block", sorted.getVal("block"));
+          ts.setVal("id", sorted.getVal("id"));
+     orig.setSorted(1); //project 2: the original table is now sorted, set flag
    }
    
    /**
@@ -61,8 +85,9 @@ public class SortScan implements Scan {
     */
    public boolean next() { //where logic is?
       if (currentscan != null) {
-         if (currentscan == s1)
+         if (currentscan == s1) {
             hasmore1 = s1.next();
+         }
          else if (currentscan == s2)
             hasmore2 = s2.next();
       }
@@ -70,15 +95,19 @@ public class SortScan implements Scan {
       if (!hasmore1 && !hasmore2)
          return false;
       else if (hasmore1 && hasmore2) {
-         if (comp.compare(s1, s2) < 0)
+         if (comp.compare(s1, s2) < 0) {
             currentscan = s1;
+         }
          else
             currentscan = s2;
       }
-      else if (hasmore1)
+      else if (hasmore1) {
          currentscan = s1;
-      else if (hasmore2)
+      }
+      else if (hasmore2) {
          currentscan = s2;
+      }
+         
       return true;
    }
    

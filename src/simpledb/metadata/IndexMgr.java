@@ -10,6 +10,7 @@ import java.util.*;
  * The index manager has similar functionalty to the table manager.
  * @author Edward Sciore
  */
+//project 2: UPDATED TO ADDED INDEX TYPE 
 public class IndexMgr {
    private TableInfo ti;
    
@@ -23,7 +24,7 @@ public class IndexMgr {
    public IndexMgr(boolean isnew, TableMgr tblmgr, Transaction tx) {
       if (isnew) {
          Schema sch = new Schema();
-         sch.addStringField("indextype", MAX_NAME);  //added
+         sch.addStringField("indextype", MAX_NAME);  //project 2: added
          sch.addStringField("indexname", MAX_NAME);
          sch.addStringField("tablename", MAX_NAME);
          sch.addStringField("fieldname", MAX_NAME);
@@ -45,7 +46,7 @@ public class IndexMgr {
    public void createIndex(String idxtype, String idxname, String tblname, String fldname, Transaction tx) {
       RecordFile rf = new RecordFile(ti, tx);
       rf.insert();
-      rf.setString("indextype", idxtype); //added
+      rf.setString("indextype", idxtype); //project 2: added
       rf.setString("indexname", idxname);
       rf.setString("tablename", tblname);
       rf.setString("fieldname", fldname);
@@ -64,7 +65,7 @@ public class IndexMgr {
       RecordFile rf = new RecordFile(ti, tx);
       while (rf.next())
          if (rf.getString("tablename").equals(tblname)) {
-         String idxtype = rf.getString("indextype");  //added      	 
+         String idxtype = rf.getString("indextype");  //project 2: added      	 
          String idxname = rf.getString("indexname");
          String fldname = rf.getString("fieldname");
          IndexInfo ii = new IndexInfo(idxtype, idxname, tblname, fldname, tx);

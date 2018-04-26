@@ -4,6 +4,7 @@ import simpledb.tx.Transaction;
 import simpledb.record.*;
 import java.util.Map;
 
+//project 2: UPDATED BASED ON HW PDF, to set sorted flag!
 public class MetadataMgr {
    private static TableMgr  tblmgr;
    private static ViewMgr   viewmgr;
@@ -21,8 +22,17 @@ public class MetadataMgr {
       tblmgr.createTable(tblname, sch, tx);
    }
    
-   public TableInfo getTableInfo(String tblname, Transaction tx) {
+   
+   public TableInfo getTableInfo(String tblname, Transaction tx) { 
       return tblmgr.getTableInfo(tblname, tx);
+   }
+   
+ //project 2: ADDED (need a set for table info!!! to set sorted flag , give table name!!)
+   public void setTableInfo(TableInfo ti, int sortFlag) {
+	   int check = ti.setSorted(sortFlag);
+	   if (ti.sorted() == check) {
+		   return;
+	   }
    }
    
    public void createView(String viewname, String viewdef, Transaction tx) {
@@ -34,7 +44,7 @@ public class MetadataMgr {
    }
    
    public void createIndex(String idxtype, String idxname, String tblname, String fldname, Transaction tx) {
-      idxmgr.createIndex(idxtype, idxname, tblname, fldname, tx); //modified to match added
+      idxmgr.createIndex(idxtype, idxname, tblname, fldname, tx); //projext 2: modified to match added idxtype attribute
    }
    
    public Map<String,IndexInfo> getIndexInfo(String tblname, Transaction tx) {

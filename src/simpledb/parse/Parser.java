@@ -8,6 +8,7 @@ import simpledb.record.Schema;
  * The SimpleDB parser.
  * @author Edward Sciore
  */
+//project 2: UPDATED SO IT CAN PARSE INDEXTYPE (in CreateIndexData())
 public class Parser {
    private Lexer lex;
    
@@ -100,7 +101,7 @@ public class Parser {
    }
    
    private Object create() {
-      lex.eatKeyword("create"); //LOOK AT SINCE YOU USED create
+      lex.eatKeyword("create"); 
       if (lex.matchKeyword("table"))
          return createTable();
       else if (lex.matchKeyword("view"))
@@ -232,8 +233,8 @@ public class Parser {
 //  Method for parsing create index commands
    
    public CreateIndexData createIndex() {
-	  lex.eatKeyword("create"); //added
-	  String idxtype = lex.eatId(); //added
+	  //lex.eatKeyword("create"); //project 2: added to parse idxtype?
+	  String idxtype = lex.eatId(); //project 2: added 
       lex.eatKeyword("index");
       String idxname = lex.eatId();
       lex.eatKeyword("on");
@@ -241,7 +242,7 @@ public class Parser {
       lex.eatDelim('(');
       String fldname = field();
       lex.eatDelim(')');
-      return new CreateIndexData(idxtype, idxname, tblname, fldname); //updated to match added
+      return new CreateIndexData(idxtype, idxname, tblname, fldname); //project 2: modified (updated to match added)
    }
 }
 

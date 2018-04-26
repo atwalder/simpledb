@@ -18,6 +18,7 @@ import simpledb.query.*;
  * index planner.
  * @author Edward Sciore
  */
+//project 2: UPDATED BASED ON HW PDF (executeCreateIndex())
 public class IndexUpdatePlanner implements UpdatePlanner {
    
    public int executeInsert(InsertData data, Transaction tx) {

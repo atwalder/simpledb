@@ -11,10 +11,12 @@ import simpledb.query.*;
  * table's metadata. 
  * @author Edward Sciore
  */
+//project 2: UPDARED TO KEEP TRACK OF TBLNAMES
 public class TempTable {
    private static int nextTableNum = 0;
    private TableInfo ti;
    private Transaction tx;
+   private String tblname; //project 2: added copy through ti 
    
    /**
     * Allocates a name for for a new temporary table
@@ -25,13 +27,20 @@ public class TempTable {
    public TempTable(Schema sch, Transaction tx) {
       String tblname = nextTableName();
       ti = new TableInfo(tblname, sch);
+      this.tblname = tblname; //project 2: set temptables tablename
       this.tx = tx;
+   }
+   
+//project 2: added getter for temp table tablename
+   public String getTablename(){ //added
+	   return this.tblname;
    }
    
    /**
     * Opens a table scan for the temporary table.
     */
    public UpdateScan open() {
+	  ti.setSorted(0); //project 2: added because a table is scanned by UpdateScan reset to false
       return new TableScan(ti, tx);
    }
    

@@ -12,6 +12,7 @@ import java.util.*;
  * @author Edward Sciore
  *
  */
+//project 2: UPDATED to set sorted flags to zero when table created (CreateTable())
 public class TableMgr {
    /**
     * The maximum number of characters in any
@@ -29,7 +30,7 @@ public class TableMgr {
     * @param isNew has the value true if the database is new
     * @param tx the startup transaction
     */
-   public TableMgr(boolean isNew, Transaction tx) {
+   public TableMgr(boolean isNew, Transaction tx) { 
       Schema tcatSchema = new Schema();
       tcatSchema.addStringField("tblname", MAX_NAME);
       tcatSchema.addIntField("reclength");
@@ -57,10 +58,11 @@ public class TableMgr {
     */
    public void createTable(String tblname, Schema sch, Transaction tx) {
       TableInfo ti = new TableInfo(tblname, sch);
+      ti.setSorted(0); //project 2: set not sorted flag
       // insert one record into tblcat
       RecordFile tcatfile = new RecordFile(tcatInfo, tx);
       tcatfile.insert();
-      tcatfile.setString("tblname", tblname);
+      tcatfile.setString("tblname", tblname); 
       tcatfile.setInt("reclength", ti.recordLength());
       tcatfile.close();
       

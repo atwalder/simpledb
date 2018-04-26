@@ -32,6 +32,11 @@ public class Schema {
     */
    public void addField(String fldname, int type, int length) {
       info.put(fldname, new FieldInfo(type, length));
+      //info.get(fldname);
+   }
+   
+   public FieldInfo getField(String fldname) {
+	   return info.get(fldname);
    }
    
    /**

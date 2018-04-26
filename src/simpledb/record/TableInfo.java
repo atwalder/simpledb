@@ -8,11 +8,13 @@ import java.util.*;
  * The metadata about a table and its records.
  * @author Edward Sciore
  */
+//project 2: added a sorted flag for the table info!
 public class TableInfo {
    private Schema schema;
    private Map<String,Integer> offsets;
    private int recordlen;
    private String tblname;
+   private int sorted; //project 2: added
    
    /**
     * Creates a TableInfo object, given a table name
@@ -32,6 +34,7 @@ public class TableInfo {
          pos += lengthInBytes(fldname);
       }
       recordlen = pos;
+      sorted = 0; //project 2: assume newly created tables are not sorted
    }
    
    /**
@@ -49,6 +52,24 @@ public class TableInfo {
       this.schema    = schema;
       this.offsets   = offsets;
       this.recordlen = recordlen;
+      sorted = 0; //project 2: assume newly created tables are not sorted
+   }
+   
+   /** project 2: ADDED
+    * Returns the sorted flag value of the table's records
+    * @return the table's sorted flag value
+    */
+   public int sorted() {
+      return sorted;
+   }
+   
+   /** project 2: ADDED
+    * Sets the sorted flag value of the table's records to the user input
+    * @return updated sort flag value
+    */
+   public int setSorted(int i) {
+	  sorted =i;
+      return sorted;
    }
    
    /**

@@ -10,22 +10,26 @@ import java.util.*;
  * The Plan class for the <i>sort</i> operator.
  * @author Edward Sciore
  */
+//project 2: UPDATED
 public class SortPlan implements Plan {
    private Plan p;
    private Transaction tx;
    private Schema sch;
    private RecordComparator comp;
-   
+   private String tblname; //project 2: added to carry through for table info
    /**
     * Creates a sort plan for the specified query.
     * @param p the plan for the underlying query
     * @param sortfields the fields to sort by
     * @param tx the calling transaction
     */
-   public SortPlan(Plan p, List<String> sortfields, Transaction tx) {
-      this.p = p;
+   
+ //project 2: added to carry through for table info
+   public SortPlan(String tblname, Plan p, List<String> sortfields, Transaction tx) { //project 2: modified
+      this.tblname = tblname; //project 2: added 
+	  this.p = p;
       this.tx = tx;
-      sch = p.schema();
+      sch = p.schema(); 
       comp = new RecordComparator(sortfields);
    }
    
@@ -37,11 +41,11 @@ public class SortPlan implements Plan {
     */
    public Scan open() {
       Scan src = p.open();
-      List<TempTable> runs = splitIntoRuns(src);
+      List<TempTable> runs = splitIntoRuns(src); //global tablename corresponds
       src.close();
       while (runs.size() > 2)
-         runs = doAMergeIteration(runs);
-      return new SortScan(runs, comp);
+         runs = doAMergeIteration(runs); //now globle table is based off runs again (via doMergeIteration)
+      return new SortScan(tblname, tx, runs, comp); //project 2: modified
    }
    
    /**
@@ -93,6 +97,7 @@ public class SortPlan implements Plan {
          return temps;
       TempTable currenttemp = new TempTable(sch, tx);
       temps.add(currenttemp);
+      currenttemp.getTableInfo().setSorted(0); //project 2: ADDED when scanned by update scan, sorted flag reset to false
       UpdateScan currentscan = currenttemp.open();
       while (copy(src, currentscan))
          if (comp.compare(src, currentscan) < 0) {
@@ -100,6 +105,7 @@ public class SortPlan implements Plan {
          currentscan.close();
          currenttemp = new TempTable(sch, tx);
          temps.add(currenttemp);
+         currenttemp.getTableInfo().setSorted(0); //project 2: ADDED when scanned by update scan, sorted flag reset to false
          currentscan = (UpdateScan) currenttemp.open();
       }
       currentscan.close();
@@ -108,13 +114,16 @@ public class SortPlan implements Plan {
    
    private List<TempTable> doAMergeIteration(List<TempTable> runs) {
       List<TempTable> result = new ArrayList<TempTable>();
+      List<String> resultnames = new ArrayList<String>();
       while (runs.size() > 1) {
          TempTable p1 = runs.remove(0);
          TempTable p2 = runs.remove(0);
          result.add(mergeTwoRuns(p1, p2));
+         resultnames.add(mergeTwoRuns(p1, p2).getTablename());
       }
       if (runs.size() == 1)
          result.add(runs.get(0));
+      	 resultnames.add(runs.get(0).getTablename());
       return result;
    }
    
@@ -122,6 +131,7 @@ public class SortPlan implements Plan {
       Scan src1 = p1.open();
       Scan src2 = p2.open();
       TempTable result = new TempTable(sch, tx);
+      result.getTableInfo().setSorted(0); //project 2: when scanned by update scan, sorted flag reset to false
       UpdateScan dest = result.open();
       
       boolean hasmore1 = src1.next();

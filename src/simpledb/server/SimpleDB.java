@@ -6,6 +6,7 @@ import simpledb.tx.Transaction;
 import simpledb.log.LogMgr;
 import simpledb.metadata.MetadataMgr;
 import simpledb.planner.*;
+import simpledb.opt.ExploitSortQueryPlanner;
 import simpledb.opt.HeuristicQueryPlanner;
 import simpledb.index.planner.IndexUpdatePlanner;
 
@@ -22,8 +23,10 @@ import simpledb.index.planner.IndexUpdatePlanner;
  * 
  * @author Edward Sciore
  */
+
+//project 2: UPDATED ACCORDING TO HW PDF (set indexupdateplanner)
 public class SimpleDB {
-   public static int BUFFER_SIZE = 8;
+   public static int BUFFER_SIZE = 10;
    public static String LOG_FILE = "simpledb.log";
    
    private static FileMgr     fm;
@@ -100,8 +103,8 @@ public class SimpleDB {
     * To change how the planner works, modify this method.
     * @return the system's planner for SQL commands
     */public static Planner planner() {
-      QueryPlanner  qplanner = new BasicQueryPlanner();
-      UpdatePlanner uplanner = new BasicUpdatePlanner();
+      QueryPlanner  qplanner = new ExploitSortQueryPlanner(); //project 2: changed
+      UpdatePlanner uplanner = new IndexUpdatePlanner(); //project 2: changed because hw pdf said to
       return new Planner(qplanner, uplanner);
    }
 }

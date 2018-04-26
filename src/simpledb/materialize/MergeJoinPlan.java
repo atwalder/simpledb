@@ -9,10 +9,12 @@ import java.util.*;
  * The Plan class for the <i>mergejoin</i> operator.
  * @author Edward Sciore
  */
+//project 2: UPDATED
 public class MergeJoinPlan implements Plan {
    private Plan p1, p2;
    private String fldname1, fldname2;
    private Schema sch = new Schema();
+   private String tblname; //project 2: added to carry through table info
    
    /**
     * Creates a mergejoin plan for the two specified queries.
@@ -24,14 +26,15 @@ public class MergeJoinPlan implements Plan {
     * @param fldname2 the RHS join field
     * @param tx the calling transaction
     */
-   public MergeJoinPlan(Plan p1, Plan p2, String fldname1, String fldname2, Transaction tx) {
+   public MergeJoinPlan(String tblname, Plan p1, Plan p2, String fldname1, String fldname2, Transaction tx) { //project 2: modifed
       this.fldname1 = fldname1;
+      this.tblname = tblname; //project 2: added
       List<String> sortlist1 = Arrays.asList(fldname1);
-      this.p1 = new SortPlan(p1, sortlist1, tx);
+      this.p1 = new SortPlan(tblname, p1, sortlist1, tx); //project 2: modified 
       
       this.fldname2 = fldname2;
       List<String> sortlist2 = Arrays.asList(fldname2);
-      this.p2 = new SortPlan(p2, sortlist2, tx);
+      this.p2 = new SortPlan(tblname, p2, sortlist2, tx); //project 2: modified
       
       sch.addAll(p1.schema());
       sch.addAll(p2.schema());
@@ -45,7 +48,7 @@ public class MergeJoinPlan implements Plan {
    public Scan open() {
       Scan s1 = p1.open();
       SortScan s2 = (SortScan) p2.open();
-      return new MergeJoinScan(s1, s2, fldname1, fldname2);
+      return new MergeJoinScan(tblname, s1, s2, fldname1, fldname2); //project 2: modified
    }
    
    /**

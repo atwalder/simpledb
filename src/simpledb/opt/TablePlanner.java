@@ -13,12 +13,14 @@ import java.util.Map;
  * This class contains methods for planning a single table.
  * @author Edward Sciore
  */
+//project 2: UPDATED THIS CLASS to have associated tablename (might not have been necessary)
 class TablePlanner {
    private TablePlan myplan;
    private Predicate mypred;
    private Schema myschema;
    private Map<String,IndexInfo> indexes;
    private Transaction tx;
+   private String tblname; //project 2: added to keep ti easier to get (might not have been necessary)
    
    /**
     * Creates a new table planner.
@@ -35,7 +37,13 @@ class TablePlanner {
       this.tx  = tx;
       myplan   = new TablePlan(tblname, tx);
       myschema = myplan.schema();
-      indexes  = SimpleDB.mdMgr().getIndexInfo(tblname, tx);
+      this.tblname = tblname; //project 2: added to global variable
+      indexes  = SimpleDB.mdMgr().getIndexInfo(tblname, tx); 
+   }
+   
+ //project 2: added getter for tablename from tableplanner object   
+   public String getTblname(){
+	   return this.tblname; //added
    }
    
    /**
@@ -59,8 +67,9 @@ class TablePlanner {
     * @param current the specified plan
     * @return a join plan of the plan and this table
     */
-   public Plan makeJoinPlan(Plan current) {
+   public Plan makeJoinPlan(Plan current) { //added
       Schema currsch = current.schema();
+      
       Predicate joinpred = mypred.joinPred(myschema, currsch);
       if (joinpred == null)
          return null;
@@ -76,8 +85,9 @@ class TablePlanner {
     * @param current the specified plan
     * @return a product plan of the specified plan and this table
     */
-   public Plan makeProductPlan(Plan current) {
-      Plan p = addSelectPred(myplan);
+   public Plan makeProductPlan(Plan current){ //, String tblname) {
+      //this.tblname = tblname;
+	  Plan p = addSelectPred(myplan);
       return new MultiBufferProductPlan(current, p, tx);
    }
    

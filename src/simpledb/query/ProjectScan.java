@@ -20,9 +20,10 @@ public class ProjectScan implements Scan {
     * @param fieldlist the list of field names
     */
    public ProjectScan(Scan s, Collection<String> fieldlist) {
-      this.s = s;
+	  this.s = s;
       this.fieldlist = fieldlist;
    }
+   
    
    public void beforeFirst() {
       s.beforeFirst();

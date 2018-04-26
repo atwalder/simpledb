@@ -6,7 +6,7 @@ import simpledb.server.SimpleDB;
 import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.index.Index;
-import simpledb.index.hash.HashIndex; 
+import simpledb.index.hash.*; 
 import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
 
 
@@ -18,8 +18,9 @@ import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
  * Its methods are essentially the same as those of Plan.
  * @author Edward Sciore
  */
+//project 2: ADDED TO INDEX INFO BECAUSE HW PDF
 public class IndexInfo {
-   private String idxtype, idxname, fldname;
+   private String idxtype, idxname, fldname; //project 2: added idxtype
    private Transaction tx;
    private TableInfo ti;
    private StatInfo si;
@@ -31,24 +32,37 @@ public class IndexInfo {
     * @param fldname the name of the indexed field
     * @param tx the calling transaction
     */
-   public IndexInfo(String idxtype, String idxname, String tblname, String fldname,
+   public IndexInfo(String idxtype, String idxname, String tblname, String fldname, //added idxtype
                     Transaction tx) {
-      this.idxtype = idxtype;
+      this.idxtype = idxtype; //project 2: added
 	  this.idxname = idxname;
       this.fldname = fldname;
       this.tx = tx;
-      ti = SimpleDB.mdMgr().getTableInfo(tblname, tx);
-      si = SimpleDB.mdMgr().getStatInfo(tblname, ti, tx);
+      this.ti = SimpleDB.mdMgr().getTableInfo(tblname, tx);
+      this.si = SimpleDB.mdMgr().getStatInfo(tblname, ti, tx);
    }
    
    /**
     * Opens the index described by this object.
     * @return the Index object associated with this information
     */
+ //project 2: open depending on index type!
    public Index open() {
       Schema sch = schema();
-      // Create new HashIndex for hash indexing
-      return new HashIndex(idxname, sch, tx);
+      RecordFile rf = new RecordFile(ti, tx); //project 2: added
+      String idxtype = rf.getString("indextype");  //project 2: added
+      if (idxtype.equals("sh")) { //project 2: added
+          return new HashIndex(idxname, sch, tx); 
+      }
+      if (idxtype.equals("eh")) { //project 2: added
+    	  return new ExtensibleHashIndex(idxname, sch, tx); //project 2: added
+    	  
+      }
+      if (idxtype.equals("bt")) { //project 2: added
+    	  return new BTreeIndex(idxname, sch, tx);  //project 2: added
+      }
+      else{return null;} //project 2: added
+      
    }
    
    /**
